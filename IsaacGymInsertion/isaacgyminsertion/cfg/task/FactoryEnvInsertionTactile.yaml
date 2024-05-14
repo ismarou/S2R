@@ -1,0 +1,133 @@
+# See schema in factory_schema_config_env.py for descriptions of common parameters.
+
+defaults:
+    - FactoryBaseTactile
+    - _self_
+    - /factory_schema_config_env
+
+sim:
+    disable_kuka_collisions: False
+    disable_socket_collisions: False
+    disable_plug_collisions: False
+
+env:
+    env_name: 'FactoryEnvInsertionTactile'
+    aggregate_mode: True
+
+#    desired_subassemblies: ['round_peg_hole_16mm_loose', 'yellow_round_peg_2in', 'red_round_peg_1_5in'] # ,
+#                             'round_peg_hole_16mm_loose',
+#                             'yellow_round_peg_2in',
+#                             'red_round_peg_1_5in',
+#                             'rectangular_peg_hole_16mm_loose']
+
+    desired_subassemblies: [ 'yellow_round_peg_2in' ]
+                        #    'red_round_peg_1_5in',red_round_peg_1_5in
+                        #     yellow_round_peg_2in, 'rectangular_peg_hole_16mm_loose', 'triangle'
+                        #   ]
+
+    plug_lateral_offset: 0.1  # Y-axis offset of plug before initial reset to prevent initial interpenetration with socket
+    plug_friction: 0.99
+
+    # Subassembly options:
+    # {round_peg_hole_4mm_tight, round_peg_hole_4mm_loose,
+    # round_peg_hole_8mm_tight, round_peg_hole_8mm_loose,
+    # round_peg_hole_12mm_tight, round_peg_hole_12mm_loose,
+    # round_peg_hole_16mm_tight, round_peg_hole_16mm_loose,
+    # rectangular_peg_hole_4mm_tight, rectangular_peg_hole_4mm_loose,
+    # rectangular_peg_hole_8mm_tight, rectangular_peg_hole_8mm_loose,
+    # rectangular_peg_hole_12mm_tight, rectangular_peg_hole_12mm_loose,
+    # rectangular_peg_hole_16mm_tight, rectangular_peg_hole_16mm_loose,
+    # bnc, dsub, usb}
+    #
+    # NOTE: BNC, D-sub, and USB are currently unavailable while we await approval from manufacturers.
+
+# Domain randomization params
+randomize:
+
+    domain_randomize: True
+    randomization_params:
+        # making frequency max_episode_length - 1, for randomization on every episode.
+        frequency: 999   # Define how many simulation steps between generating new randomization
+        observations:
+            range: [ 0, .002 ] # range for the white noise
+            range_correlated: [ 0, .000 ] # range for correlated noise, refreshed with freq `frequency`
+            operation: "additive"
+            distribution: "gaussian"
+            # schedule: "linear"   # "constant" is to turn on noise after `schedule_steps` num steps
+            # schedule_steps: 40000
+        actions:
+            range: [ 0., .02 ]
+            range_correlated: [ 0, .01 ] # range for correlated noise, refreshed with freq `frequency`
+            operation: "additive"
+            distribution: "gaussian"
+            # schedule: "linear"  # "linear" will linearly interpolate between no rand and max rand
+            # schedule_steps: 40000
+        sim_params:
+            gravity:
+                range: [ 0, 0.4 ]
+                operation: "additive"
+                distribution: "gaussian"
+                # schedule: "linear"  # "linear" will linearly interpolate between no rand and max rand
+                # schedule_steps: 40000
+        actor_params:
+            kuka:
+                color: False
+                dof_properties:
+                    lower:
+                        range: [ 0, 0.01 ]
+                        operation: "additive"
+                        distribution: "gaussian"
+                        # schedule: "linear"  # "linear" will scale the current random sample by `min(current num steps, schedule_steps) / schedule_steps`
+                        # schedule_steps: 30000
+                    upper:
+                        range: [ 0, 0.01 ]
+                        operation: "additive"
+                        distribution: "gaussian"
+                        # schedule: "linear"  # "linear" will scale the current random sample by `min(current num steps, schedule_steps) / schedule_steps`
+                        # schedule_steps: 30000
+                rigid_shape_properties:
+                    friction:
+                        num_buckets: 250
+                        range: [ 1.0, 1.0 ]
+                        operation: "scaling"
+                        distribution: "uniform"
+            plug:
+#                scale:
+#                    range: [ 0.97, 1.0 ]
+#                    operation: "scaling"
+#                    distribution: "uniform"
+#                    setup_only: True # Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
+#                    # schedule: "linear"  # "linear" will scale the current random sample by ``min(current num steps, schedule_steps) / schedule_steps`
+#                    # schedule_steps: 30000
+                # rigid_body_properties:
+                #     mass:
+                #         range: [ 0.1, 0.1 ]
+                #         operation: "scaling"
+                #         distribution: "uniform"
+                #         setup_only: True # Property will only be randomized once before simulation is started. See Domain Randomization Documentation for more info.
+                #         # schedule: "linear"  # "linear" will scale the current random sample by ``min(current num steps, schedule_steps) / schedule_steps`
+                #         # schedule_steps: 30000
+                rigid_shape_properties:
+                    friction:
+                        num_buckets: 250
+                        range: [ 0.65, 1.0 ]
+                        operation: "scaling"
+                        distribution: "uniform"
+                        
+                        # schedule: "linear"  # "linear" will scale the current random sample by `min(current num steps, schedule_steps) / schedule_steps`
+                        # schedule_steps: 30000
+            table:
+                rigid_shape_properties:
+                    friction:
+                        num_buckets: 250
+                        range: [ 0.0, 0.0 ]
+                        operation: "scaling"
+                        distribution: "uniform"
+
+            socket:
+                rigid_shape_properties:
+                    friction:
+                        num_buckets: 250
+                        range: [ 0.5, 1.0 ]
+                        operation: "scaling"
+                        distribution: "uniform"
